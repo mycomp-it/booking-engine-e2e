@@ -1,0 +1,25 @@
+{
+  "name": "booking-engine-e2e",
+  "version": "1.0.0",
+  "description": "E2E tests for Booking Engine",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "test:headed": "npx playwright test --headed",
+    "test:debug": "playwright test --debug",
+    "test:ui": "npx playwright test --ui",
+    "test:firefox": "npx playwright test --project=firefox",
+    "test:webkit": "npx playwright test --project=webkit",
+    "test:chrome": "npx playwright test --project=chromium",
+    "test:report": "npx playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^24.3.1",
+    "dotenv": "^17.2.3",
+    "tsx": "^4.19.2"
+  }
+}
