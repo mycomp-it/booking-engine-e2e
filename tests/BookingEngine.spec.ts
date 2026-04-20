@@ -8,10 +8,11 @@ import { BEConfirmPageForm } from '../page-objects/BookingEngine/BEConfirmPageFo
 test.setTimeout(210000)
 test.use({ actionTimeout: 10000 })
 
-test('Ricerca di disponibilità', async ({ page }) => {
-  const startUrl = process.env.BASE_URL + '/.eshop?idcliente=preprod_hotel&idvendor=3&idsito=1&lang=1&';
-  await page.goto(startUrl)
+const startUrl = process.env.BASE_URL + '/.eshop?idcliente=preprod_hotel&idvendor=3&idsito=1&lang=1&';
 
+test('Ricerca di disponibilità', async ({ page }) => {
+
+  await page.goto(startUrl)
   const startPage = new BESearchPage(page);
   await startPage.check();
   const optionalServicesPage = new OptionalServicesPage(page);
@@ -40,7 +41,27 @@ test('Ricerca di disponibilità', async ({ page }) => {
   const confirmPageForm: BEConfirmPageForm = await confirmPage.getConfirmPageForm();
   await confirmPageForm.check();
   await confirmPageForm.submitForm();
- // await confirmPageForm.checkMandatoryErrors();
+  // await confirmPageForm.checkMandatoryErrors();
   await confirmPageForm.fillForm();
   await confirmPageForm.submitForm();
 })
+
+test('it allows to check the mdodal', async ({ page }) => {
+  await page.goto(startUrl)
+  const startPage = new BESearchPage(page);
+  await startPage.check();
+  const today = new Date();
+  const checkInDate = new Date(today);
+  checkInDate.setDate(today.getDate() + 2);
+  const checkOutDate = new Date(today);
+  checkOutDate.setDate(today.getDate() + 3);
+  const resultsPage: BESearchPage = await startPage.search(checkInDate, checkOutDate);
+  await resultsPage.checkAfterSearch(checkInDate, checkOutDate);
+  const firstResultItem: BEResultItemPage = await resultsPage.getFirstResult();
+  await firstResultItem.check();
+  await firstResultItem.openModal();
+  await firstResultItem.checkModal();
+  await firstResultItem.closeModal();
+
+
+});
