@@ -51,7 +51,7 @@ export default class BEResultItemPage {
     //await this.shoppingCartCTAGroup.first().waitFor({state:'visible'});
     // console.log(await this.shoppingCartCTAGroup.nth(1).isVisible())
     if (await this.shoppingCartCTAGroup.nth(1).isVisible()) {
-      expect(await this.shoppingCartCTAGroup.count()).toBeGreaterThan(0)
+      await expect(await this.shoppingCartCTAGroup.count()).toBeGreaterThan(0)
       for (let i = 0; i < await this.shoppingCartCTAGroup.count(); i++) {
         await expect(this.shoppingCartCTAGroup.nth(i)).toBeVisible();
         await expect(this.shoppingCartCTAGroup.nth(i)).toBeEnabled();
@@ -59,7 +59,7 @@ export default class BEResultItemPage {
     } else {
 
 
-      expect(await this.CTAGroup.count()).toBeGreaterThan(0)
+      await expect(await this.CTAGroup.count()).toBeGreaterThan(0)
       for (let i = 0; i < await this.CTAGroup.count(); i++) {
         await expect(this.CTAGroup.nth(i)).toBeVisible();
         await expect(this.CTAGroup.nth(i)).toBeEnabled();
