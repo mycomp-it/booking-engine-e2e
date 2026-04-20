@@ -55,11 +55,11 @@ export default defineConfig({
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-    {
-
-      name: 'Mobile Android Chrome',
-      use: { ...devices['Pixel 5'] }, // Un dispositivo Android comune
-    },
+    // Mobile Android Chrome rimosso: il calendario del BE non supporta viewport mobile
+    // {
+    //   name: 'Mobile Android Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
     /*
         {
           name: 'webkit',
