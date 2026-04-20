@@ -19,6 +19,22 @@ inputs:
     description: "Se 'true' monta i test locali dal workspace nel container"
     required: false
     default: 'false'
+  be-tenant-id:
+    description: 'Valore di idcliente per la URL del Booking Engine'
+    required: false
+    default: ''
+  be-vendor-id:
+    description: 'Valore di idvendor per la URL del Booking Engine'
+    required: false
+    default: ''
+  be-site-id:
+    description: 'Valore di idsito per la URL del Booking Engine'
+    required: false
+    default: ''
+  be-lang:
+    description: 'Valore di lang per la URL del Booking Engine'
+    required: false
+    default: ''
 
 runs:
   using: "composite"
@@ -56,6 +72,10 @@ runs:
         docker run --rm --ipc=host \
           -e HOME=/tmp \
           -e BASE_URL="${{ inputs.target-url }}" \
+          -e BE_TENANT_ID="${{ inputs.be-tenant-id }}" \
+          -e BE_VENDOR_ID="${{ inputs.be-vendor-id }}" \
+          -e BE_SITE_ID="${{ inputs.be-site-id }}" \
+          -e BE_LANG="${{ inputs.be-lang }}" \
           --user $(id -u):$(id -g) \
           ${MOUNT_OPTIONS} \
           "${{ env.final_image }}"
