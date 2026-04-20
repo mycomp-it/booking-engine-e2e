@@ -89,8 +89,8 @@ export class BEConfirmPageForm {
         }
 
         async submitForm() {
-                await this.submitButton.waitFor({ state: 'visible' })
-                await this.submitButton.click()
+                await this.submitButton.waitFor({ state: 'visible' });
+                await this.submitButton.click();
         }
         async fillForm(nameValue?:string, surnameValue?:string, emailValue?:string, communicationType?:BookingEngineMezzo, languageValue?:BookingEngineLingua,) {
                 await this.nameContainer.fill(nameValue || 'Test E2e Emanuele');
@@ -107,9 +107,9 @@ export class BEConfirmPageForm {
                         return null;
                 };
 
-                // try the explicit communicationType, otherwise BookingEngineMezzo.CHAT; if not present, pick the first available option with a non-empty value
-                const desiredComm = communicationType || BookingEngineMezzo.CHAT;
-                if (desiredComm) {
+                // Mezzo di comunicazione: solo se visibile
+                if (await this.communicationTypeContainer.isVisible()) {
+                        const desiredComm = communicationType || BookingEngineMezzo.CHAT;
                         const exists = await this.communicationTypeContainer.locator(`option[value="${desiredComm}"]`).count() > 0;
                         if (exists) {
                                 await this.communicationTypeContainer.selectOption({ value: desiredComm });
@@ -121,18 +121,32 @@ export class BEConfirmPageForm {
                                         await this.communicationTypeContainer.selectOption({ index: 0 });
                                 }
                         }
-                } else {
-                        const firstValue = await findFirstNonEmptyOption(this.communicationTypeContainer);
-                        if (firstValue) {
-                                await this.communicationTypeContainer.selectOption({ value: firstValue });
-                        } else {
-                                await this.communicationTypeContainer.selectOption({ index: 0 });
-                        }
                 }
 
-                await this.languageContainer.selectOption({ value: languageValue || BookingEngineLingua.ITALIANO });
-                //console.log('inviati i dati del form correttamente, break ');
-                const textLanguage = await this.languageContainer.textContent();
+                // Lingua: solo se visibile
+                if (await this.languageContainer.isVisible()) {
+                        await this.languageContainer.selectOption({ value: languageValue || BookingEngineLingua.ITALIANO });
+                }
+
+                // Checkbox condizioni: se presente e non ancora spuntata, la spunta via JS
+                const condizioniCheckbox = this.page.locator('#condizioni');
+                if (await condizioniCheckbox.count() > 0 && !(await condizioniCheckbox.isChecked())) {
+                        await condizioniCheckbox.evaluate((el: any) => {
+                                el.checked = true;
+                                el.dispatchEvent(new Event('change', { bubbles: true }));
+                                el.dispatchEvent(new Event('click', { bubbles: true }));
+                        });
+                }
+
+                // Radio marketing: scopo dentro #bookaccleft per evitare duplicati, seleziona NO se nessuno è già selezionato
+                const marketingYes = this.formContainer.locator('#cnfmrk-y-7');
+                const marketingNo = this.formContainer.locator('#cnfmrk-n-7');
+                if (await marketingYes.isVisible()) {
+                        const alreadySelected = (await marketingYes.isChecked()) || (await marketingNo.isChecked());
+                        if (!alreadySelected) {
+                                await marketingNo.check();
+                        }
+                }
         }
 
         async setNextAction(actionType: BookingEngineAzione | BookingEngineFromPlanning) {
