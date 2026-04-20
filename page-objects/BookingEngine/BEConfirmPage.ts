@@ -1,8 +1,6 @@
-import { Page, Locator, expect } from '@playwright/test';
+import { Page, Locator } from '@playwright/test';
 import { BEConfirmPageForm } from './BEConfirmPageForm';
 import { BookingEngineAzione, BookingEngineFromPlanning } from '../../Utils/BookingEngineFormEnums';
-import BOTrattativaDetailsPage from '../Trattativa/BOTrattativaDetailsPage';
-import BOGestionaleReservationDetailsPage from '../BackOffice/BOGestionaleReservationDetailsPage';
 
 export default class BEConfirmPage {
     page: Page;
@@ -20,14 +18,6 @@ export default class BEConfirmPage {
     }
     async nextAction(actionType: BookingEngineAzione | BookingEngineFromPlanning) {
         await this.form.setNextAction(actionType)
-    }
-    async submitFormTrattativa() {
-        await this.form.submitForm()
-        return new BOTrattativaDetailsPage(this.page)
-    }
-    async submitFormGestionale() {
-        await this.form.submitForm()
-        return new BOGestionaleReservationDetailsPage(this.page)
     }
     async getConfirmPageForm() {
         return this.form

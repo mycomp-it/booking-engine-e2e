@@ -19,7 +19,7 @@ export default defineConfig({
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
   /* Retry on CI only */
-  retries: 2,
+  retries: 0,
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
@@ -55,11 +55,11 @@ export default defineConfig({
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-    {
-
-      name: 'Mobile Android Chrome',
-      use: { ...devices['Pixel 5'] }, // Un dispositivo Android comune
-    },
+    // Mobile Android Chrome rimosso: il calendario del BE non supporta viewport mobile
+    // {
+    //   name: 'Mobile Android Chrome',
+    //   use: { ...devices['Pixel 5'] },
+    // },
     /*
         {
           name: 'webkit',

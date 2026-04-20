@@ -48,10 +48,11 @@ export default class BEResultItemPage {
   }
   async checkCTAButtons() {
     await waitForLoadState(this.page);
-    //await this.shoppingCartCTAGroup.first().waitFor({state:'visible'});
+    // Attende che almeno uno dei bottoni sia presente prima di contarli
+    await this.page.locator(`#${this.containerId} button[type='submit'], #${this.containerId} .cart.fa-shopping-cart`).first().waitFor({ state: 'attached', timeout: 10000 });
     // console.log(await this.shoppingCartCTAGroup.nth(1).isVisible())
     if (await this.shoppingCartCTAGroup.nth(1).isVisible()) {
-      expect(await this.shoppingCartCTAGroup.count()).toBeGreaterThan(0)
+      await expect(await this.shoppingCartCTAGroup.count()).toBeGreaterThan(0)
       for (let i = 0; i < await this.shoppingCartCTAGroup.count(); i++) {
         await expect(this.shoppingCartCTAGroup.nth(i)).toBeVisible();
         await expect(this.shoppingCartCTAGroup.nth(i)).toBeEnabled();
@@ -59,7 +60,7 @@ export default class BEResultItemPage {
     } else {
 
 
-      expect(await this.CTAGroup.count()).toBeGreaterThan(0)
+      await expect(await this.CTAGroup.count()).toBeGreaterThan(0)
       for (let i = 0; i < await this.CTAGroup.count(); i++) {
         await expect(this.CTAGroup.nth(i)).toBeVisible();
         await expect(this.CTAGroup.nth(i)).toBeEnabled();
