@@ -2,8 +2,6 @@ name: 11-Run-E2E-Tests-On-PR
 
 on:
   pull_request:
-    branches-ignore:
-      - main
   workflow_dispatch:
     inputs:
       target-url:
