@@ -1,0 +1,61 @@
+name: 'Run Booking Engine E2E Tests'
+description: 'Esegue i test E2E del Booking Engine tramite Docker'
+
+inputs:
+  target-url:
+    description: 'URL del Booking Engine su cui eseguire i test'
+    required: true
+  gh-token:
+    description: 'GitHub token con accesso in lettura a GHCR'
+    required: true
+  image-full-name:
+    description: 'Nome completo (con tag) dell immagine Docker da usare'
+    required: true
+  pull-image:
+    description: "Se 'true' esegue il pull dell immagine prima di avviarla"
+    required: false
+    default: 'true'
+  mount-local-tests:
+    description: "Se 'true' monta i test locali dal workspace nel container"
+    required: false
+    default: 'false'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Pull Docker Image
+      if: inputs.pull-image == 'true'
+      shell: bash
+      run: |
+        echo "${{ inputs.gh-token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        FALLBACK="ghcr.io/${{ github.repository }}:main"
+        if ! docker pull "${{ inputs.image-full-name }}"; then
+          echo "Immagine non trovata, uso fallback: ${FALLBACK}"
+          docker pull "${FALLBACK}"
+          echo "final_image=${FALLBACK}" >> $GITHUB_ENV
+        else
+          echo "final_image=${{ inputs.image-full-name }}" >> $GITHUB_ENV
+        fi
+
+    - name: Create report directory
+      shell: bash
+      run: mkdir -p ${{ github.workspace }}/playwright-report
+
+    - name: Run E2E Test Container
+      shell: bash
+      run: |
+        MOUNT_OPTIONS="-v ${{ github.workspace }}/playwright-report:/app/playwright-report"
+
+        if [[ "${{ inputs.mount-local-tests }}" == "true" ]]; then
+          MOUNT_OPTIONS+=" -v ${{ github.workspace }}/tests:/app/tests"
+          MOUNT_OPTIONS+=" -v ${{ github.workspace }}/page-objects:/app/page-objects"
+          MOUNT_OPTIONS+=" -v ${{ github.workspace }}/Utils:/app/Utils"
+          MOUNT_OPTIONS+=" -v ${{ github.workspace }}/playwright.config.ts:/app/playwright.config.ts"
+        fi
+
+        docker run --rm --ipc=host \
+          -e HOME=/tmp \
+          -e BASE_URL="${{ inputs.target-url }}" \
+          --user $(id -u):$(id -g) \
+          ${MOUNT_OPTIONS} \
+          "${{ env.final_image }}"
