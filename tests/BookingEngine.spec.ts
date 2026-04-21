@@ -8,7 +8,7 @@ import { BEConfirmPageForm } from '../page-objects/BookingEngine/BEConfirmPageFo
 test.setTimeout(210000)
 test.use({ actionTimeout: 10000 })
 
-const startUrl = process.env.BASE_URL + '/.eshop?idcliente=preprod_hotel&idvendor=3&idsito=1&lang=1&';
+const startUrl = `${process.env.BASE_URL}/.eshop?idcliente=${process.env.BE_TENANT_ID}&idvendor=${process.env.BE_VENDOR_ID}&idsito=${process.env.BE_SITE_ID}&lang=${process.env.BE_LANG}&`;
 
 test('Ricerca di disponibilità', async ({ page }) => {
 

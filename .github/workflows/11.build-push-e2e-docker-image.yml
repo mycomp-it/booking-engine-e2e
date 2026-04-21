@@ -90,6 +90,10 @@ jobs:
           pull-image: 'true'
           mount-local-tests: 'true'
           gh-token: ${{ secrets.GITHUB_TOKEN }}
+          be-tenant-id: ${{ vars.BE_TENANT_ID }}
+          be-vendor-id: ${{ vars.BE_VENDOR_ID }}
+          be-site-id: ${{ vars.BE_SITE_ID }}
+          be-lang: ${{ vars.BE_LANG }}
 
       - name: Determine Report Name
         id: report_vars
