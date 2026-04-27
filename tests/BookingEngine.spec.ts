@@ -17,16 +17,7 @@ test('Ricerca di disponibilità', async ({ page }) => {
   await startPage.check();
   const optionalServicesPage = new OptionalServicesPage(page);
 
-  const today = new Date();
-  const checkInDate = new Date(today);
-  checkInDate.setDate(today.getDate() + 2);
-  const checkOutDate = new Date(today);
-  checkOutDate.setDate(today.getDate() + 3);
-  console.log(`Data del checkIn (data odierna + 2 giorni): ${checkInDate}`)
-  console.log(`Data del checkOut (data odierna + 3 giorni): ${checkOutDate}`)
-
-  const resultsPage: BESearchPage = await startPage.search(checkInDate, checkOutDate);
-  await resultsPage.checkAfterSearch(checkInDate, checkOutDate);
+  const resultsPage: BESearchPage = await startPage.searchFirstAvailable();
 
   const firstResultItem: BEResultItemPage = await resultsPage.getFirstResult();
   const itemPrice = await firstResultItem.getFirstPrice();
@@ -35,33 +26,29 @@ test('Ricerca di disponibilità', async ({ page }) => {
   await firstResultItem.checkCTAButtons();
   const confirmPage: BEConfirmPage = await firstResultItem.clickFirstCTAButton();
 
-  // Se presente la pagina dei servizi opzionali, la salta e va al form
   await optionalServicesPage.isOptionalServices();
 
   const confirmPageForm: BEConfirmPageForm = await confirmPage.getConfirmPageForm();
   await confirmPageForm.check();
   await confirmPageForm.submitForm();
-  // await confirmPageForm.checkMandatoryErrors();
+  await confirmPageForm.checkMandatoryErrors();
   await confirmPageForm.fillForm();
   await confirmPageForm.submitForm();
+  await confirmPageForm.waitForThankYouPage();
+  
+
 })
 
-test('it allows to check the mdodal', async ({ page }) => {
+test('it allows to check the modal', async ({ page }) => {
   await page.goto(startUrl)
   const startPage = new BESearchPage(page);
   await startPage.check();
-  const today = new Date();
-  const checkInDate = new Date(today);
-  checkInDate.setDate(today.getDate() + 2);
-  const checkOutDate = new Date(today);
-  checkOutDate.setDate(today.getDate() + 3);
-  const resultsPage: BESearchPage = await startPage.search(checkInDate, checkOutDate);
-  await resultsPage.checkAfterSearch(checkInDate, checkOutDate);
+
+  const resultsPage: BESearchPage = await startPage.searchFirstAvailable();
+
   const firstResultItem: BEResultItemPage = await resultsPage.getFirstResult();
   await firstResultItem.check();
   await firstResultItem.openModal();
   await firstResultItem.checkModal();
   await firstResultItem.closeModal();
-
-
 });

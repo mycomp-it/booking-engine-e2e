@@ -16,6 +16,12 @@ export default class BESearchPage {
         await this.confirmSearch();
         return new BESearchPage(this.page)
     }
+
+    async searchFirstAvailable(): Promise<BESearchPage> {
+        await this.calendar.selectFirstAvailableDates();
+        await this.confirmSearch();
+        return new BESearchPage(this.page);
+    }
     
     async check() {
         await this.calendar.checkCalendar()

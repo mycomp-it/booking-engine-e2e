@@ -17,31 +17,22 @@ const startUrl = `${process.env.BASE_URL}/.eshop?idcliente=${process.env.BE_TENA
 test.describe('Booking Engine — Prenotazione', () => {
 
     // Gherkin: Schema "prenotazione carta di credito a garanzia"
-    // Checkin oggi, checkout domani, 1 adulto → continua → compila form → conferma
+    // Prima data disponibile, 1 adulto → continua → compila form → conferma
     // → pagina "richiesta di disponibilità confermata" → trattativa in stato "nuove"
     // Nota: la verifica della trattativa nel BO è coperta dai test di bo-pms-e2e
     test('Prenotazione con carta di credito a garanzia — flusso BE', async ({ page }) => {
         await page.goto(startUrl);
         const searchPage = new BESearchPage(page);
 
-        const today = new Date();
-        const checkInDate = new Date(today);
-        checkInDate.setDate(today.getDate() + 4);
-        const checkOutDate = new Date(today);
-        checkOutDate.setDate(today.getDate() + 5);
-
-        const confirmPage: BEConfirmPage = await searchAndExectBookingEngineBasicReservation(
-            searchPage,
-            checkInDate,
-            checkOutDate
-        );
+        const confirmPage: BEConfirmPage = await searchAndExectBookingEngineBasicReservation(searchPage);
 
         await confirmPage.form.submitForm();
+         await confirmPage.form.waitForThankYouPage();
     });
 
     // Gherkin: Schema "prenotazione con payment gateway e assicurazione" @inLavorazione
     // Richiede configurazione payment gateway Saferpay — marcato come skip
-    test.skip('Prenotazione con payment gateway e assicurazione', async ({ page }) => {
+    test.skip('Prenotazione con payment gateway e assicurazione', async () => {
         // Prerequisito: payment gateway Saferpay abilitato + piano tariffario "Not Refundable"
         // Non replicabile senza configurazione specifica dell'ambiente
     });
@@ -57,14 +48,7 @@ test.describe('Booking Engine — Scenari avanzati', () => {
         await page.goto(startUrl);
         const searchPage = new BESearchPage(page);
 
-        const today = new Date();
-        const checkInDate = new Date(today);
-        checkInDate.setDate(today.getDate() + 2);
-        const checkOutDate = new Date(today);
-        checkOutDate.setDate(today.getDate() + 3);
-
-        const resultsPage: BESearchPage = await searchPage.search(checkInDate, checkOutDate);
-        await resultsPage.checkAfterSearch(checkInDate, checkOutDate);
+        const resultsPage: BESearchPage = await searchPage.searchFirstAvailable();
 
         const firstResult: BEResultItemPage = await resultsPage.getFirstResult();
         await firstResult.checkCTAButtons();
@@ -77,6 +61,7 @@ test.describe('Booking Engine — Scenari avanzati', () => {
         await form.check();
         await form.fillForm();
         await form.submitForm();
+        await form.waitForThankYouPage();
     });
 
 });
